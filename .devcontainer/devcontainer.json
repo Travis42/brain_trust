@@ -1,0 +1,41 @@
+{
+    "name": "Braintrust",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/app",
+    "settings": {
+      "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "extensions": [
+        "batisteo.vscode-django",
+        "eeyore.yapf",
+        "fabiospampinato.vscode-diff",
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-github-actions",
+        "huizhou.githd",
+        "janisdd.vscode-edit-csv",
+        "mechatroner.rainbow-csv",
+        "mgesbert.python-path",
+        "mhutchie.git-graph",
+        "ms-azuretools.vscode-docker",
+        "ms-python.debugpy",
+        "ms-python.flake8",
+        "ms-python.isort",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.jupyter-renderers",
+        "ms-toolsai.vscode-jupyter-cell-tags",
+        "ms-toolsai.vscode-jupyter-slideshow",
+        "ms-vsliveshare.vsliveshare",
+        "streetsidesoftware.code-spell-checker",
+        "tomoki1207.pdf",
+        "waderyan.gitblame",
+        "yzhang.markdown-all-in-one"
+      ],
+    "postCreateCommand": "pip install -r requirements.txt",
+    "remoteUser": "root"
+  }
+  
