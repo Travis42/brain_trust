@@ -1,6 +1,6 @@
 # Brain Trust CLI
 
-A multi-agent deliberation system powered by LangGraph and z.ai GLM models. Brain Trust simulates a panel of expert advisors who analyze your question from different perspectives, providing comprehensive insights through parallel reasoning and executive summarization.
+A multi-agent deliberation system powered by LangGraph and OpenRouter. Brain Trust simulates a panel of expert advisors who analyze your question from different perspectives, providing comprehensive insights through parallel reasoning and executive summarization.
 
 ## Features
 
@@ -25,7 +25,7 @@ pip install -r requirements.txt
 
 ## Configuration
 
-Create a `.env` file in the project root with your z.ai API credentials:
+Create a `.env` file in the project root with your OpenRouter API credentials:
 
 ```bash
 # Copy the example file
@@ -35,9 +35,9 @@ cp .env.example .env
 Edit `.env` and set your API key:
 
 ```env
-ZAI_API_KEY=your_api_key_here
-ZAI_API_BASE=https://api.z.ai/v1
-MODEL=glm-4
+OPENROUTER_API_KEY=your_api_key_here
+OPENROUTER_API_BASE=https://openrouter.ai/api/v1
+MODEL=anthropic/claude-3.5-sonnet
 TEMPERATURE=0.7
 TOP_P=1.0
 ```
@@ -46,9 +46,9 @@ TOP_P=1.0
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `ZAI_API_KEY` | Yes | - | Your z.ai API key |
-| `ZAI_API_BASE` | No | `https://api.z.ai/v1` | z.ai API base URL |
-| `MODEL` | No | `glm-4` | Model name to use |
+| `OPENROUTER_API_KEY` | Yes | - | Your OpenRouter API key |
+| `OPENROUTER_API_BASE` | No | `https://openrouter.ai/api/v1` | OpenRouter API base URL |
+| `MODEL` | No | `anthropic/claude-3.5-sonnet` | Model name to use |
 | `TEMPERATURE` | No | `0.7` | Sampling temperature (0.0-2.0) |
 | `TOP_P` | No | `1.0` | Nucleus sampling parameter (0.0-1.0) |
 
@@ -142,7 +142,7 @@ You can extend Brain Trust by adding custom personas. See [`PERSONAS.md`](PERSON
 ## Requirements
 
 - Python 3.10+
-- z.ai API key
+- OpenRouter API key
 - Dependencies listed in [`requirements.txt`](requirements.txt)
 
 ## License

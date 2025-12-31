@@ -7,8 +7,21 @@ and private scratchpads for multi-agent deliberation.
 from typing import Annotated, TypedDict, Literal, Optional
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+import operator
 
-from src.config import get_openai_client
+
+def merge_dicts(left: dict, right: dict) -> dict:
+    """Merge two dictionaries, with right taking precedence for overlapping keys."""
+    result = left.copy()
+    result.update(right)
+    return result
+
+
+def keep_first(left, right):
+    """Reducer that keeps the first value (for fields that shouldn't change)."""
+    return left if left is not None else right
+
+from src.config import get_openai_client, load_config
 from src.personas import PERSONAS, Persona
 
 
@@ -24,13 +37,13 @@ class BrainTrustState(TypedDict):
         dissent: List of disagreements identified by the Summarizer
         transcript: Optional transcript for verbose logging
     """
-    question: str
-    selected_personas: Optional[list[str]]
-    advisor_outputs: dict[str, str]
-    scratchpads: dict[str, str]
-    summary: str
-    dissent: list[str]
-    transcript: Optional[list[dict]]
+    question: Annotated[str, keep_first]
+    selected_personas: Annotated[Optional[list[str]], keep_first]
+    advisor_outputs: Annotated[dict[str, str], merge_dicts]
+    scratchpads: Annotated[dict[str, str], merge_dicts]
+    summary: Annotated[str, keep_first]
+    dissent: Annotated[list[str], operator.add]
+    transcript: Annotated[Optional[list[dict]], keep_first]
 
 
 def advisor_node(persona_name: str):
@@ -207,51 +220,6 @@ Format your response as:
     return state
 
 
-def create_brain_trust_graph():
-    """Create and compile the brain trust LangGraph.
-    
-    The graph structure:
-    - All advisor nodes run in parallel
-    - All advisors connect to the summarizer node
-    - Summarizer connects to END
-    
-    Returns:
-        A compiled StateGraph ready for invocation
-    """
-    # Create the state graph
-    graph = StateGraph(BrainTrustState)
-    
-    # Add advisor nodes for all personas except Summarizer
-    advisor_names = [
-        name for name, persona in PERSONAS.items()
-        if not persona.is_summarizer
-    ]
-    
-    for advisor_name in advisor_names:
-        graph.add_node(advisor_name, advisor_node(advisor_name))
-    
-    # Add the summarizer node
-    graph.add_node("summarizer", summarizer_node)
-    
-    # Connect all advisors to the summarizer (parallel execution)
-    for advisor_name in advisor_names:
-        graph.add_edge(advisor_name, "summarizer")
-    
-    # Connect summarizer to END
-    graph.add_edge("summarizer", END)
-    
-    # Set the entry point - we'll use the first advisor as entry,
-    # but all advisors will run in parallel
-    if advisor_names:
-        graph.set_entry_point(advisor_names[0])
-        # Connect entry to all other advisors for parallel execution
-        for advisor_name in advisor_names[1:]:
-            graph.add_edge(advisor_names[0], advisor_name)
-    
-    # Compile the graph
-    return graph.compile()
-
-
 def run_brain_trust(
     question: str,
     selected_personas: Optional[list[str]] = None,
@@ -268,8 +236,14 @@ def run_brain_trust(
     Returns:
         The final state with advisor_outputs, summary, and dissent populated
     """
+    # Get all advisor personas (always run all advisors)
+    advisor_names = [
+        name for name, persona in PERSONAS.items()
+        if not persona.is_summarizer
+    ]
+    
     # Initialize state
-    initial_state: BrainTrustState = {
+    state: BrainTrustState = {
         "question": question,
         "selected_personas": selected_personas,
         "advisor_outputs": {},
@@ -279,8 +253,12 @@ def run_brain_trust(
         "transcript": [] if verbose else None
     }
     
-    # Create and invoke the graph
-    graph = create_brain_trust_graph()
-    final_state = graph.invoke(initial_state)
+    # Run all advisor nodes sequentially (each updates state in-place)
+    for advisor_name in advisor_names:
+        advisor_func = advisor_node(advisor_name)
+        state = advisor_func(state)
     
-    return final_state
+    # Run the summarizer node
+    state = summarizer_node(state)
+    
+    return state

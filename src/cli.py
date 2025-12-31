@@ -26,30 +26,6 @@ app = typer.Typer(
 console = Console()
 
 
-def validate_personas(personas_list: list[str]) -> list[str]:
-    """Validate that all provided persona names exist in PERSONAS.
-    
-    Args:
-        personas_list: List of persona names to validate
-        
-    Returns:
-        The validated list of persona names
-        
-    Raises:
-        typer.BadParameter: If any persona name is invalid
-    """
-    invalid_personas = [p for p in personas_list if p not in PERSONAS]
-    
-    if invalid_personas:
-        available = ", ".join(sorted(PERSONAS.keys()))
-        raise typer.BadParameter(
-            f"Invalid persona(s): {', '.join(invalid_personas)}\n"
-            f"Available personas: {available}"
-        )
-    
-    return personas_list
-
-
 def print_summary(summary: str, dissent: list[str]) -> None:
     """Print the executive summary using rich formatting.
     
@@ -163,13 +139,6 @@ def main(
         help="The question or topic for deliberation",
         show_default=False
     ),
-    personas: Optional[str] = typer.Option(
-        None,
-        "--personas",
-        "-p",
-        help="Comma-separated list of persona names to use (default: all advisors)",
-        show_default=False
-    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -186,13 +155,12 @@ def main(
 ) -> None:
     """Run brain trust deliberation on a question.
     
-    This command runs the multi-agent deliberation system with the specified
-    personas (or all advisors if none specified) and produces an executive
-    summary along with individual advisor outputs.
+    This command runs the multi-agent deliberation system with all advisors
+    and produces an executive summary along with individual advisor outputs.
     
     Example usage:
         brain-trust "Should we adopt a microservices architecture?"
-        brain-trust "What's the best approach for data migration?" --personas strategist,domain_expert
+        brain-trust "What's the best approach for data migration?"
         brain-trust "How should we prioritize technical debt?" --verbose
     """
     try:
@@ -201,19 +169,12 @@ def main(
         config = load_config()
         console.print("[green]✓[/green] Configuration loaded successfully\n")
         
-        # Parse personas if provided
-        selected_personas = None
-        if personas:
-            personas_list = [p.strip() for p in personas.split(",") if p.strip()]
-            selected_personas = validate_personas(personas_list)
-            console.print(f"[dim]Using personas: {', '.join(selected_personas)}[/dim]\n")
-        else:
-            # Get all non-summarizer personas
-            selected_personas = [
-                name for name, persona in PERSONAS.items()
-                if not persona.is_summarizer
-            ]
-            console.print(f"[dim]Using all advisors: {', '.join(selected_personas)}[/dim]\n")
+        # Get all non-summarizer personas (always run all advisors)
+        selected_personas = [
+            name for name, persona in PERSONAS.items()
+            if not persona.is_summarizer
+        ]
+        console.print(f"[dim]Using all advisors: {', '.join(selected_personas)}[/dim]\n")
         
         # Print the question
         console.print(
@@ -249,11 +210,6 @@ def main(
     except ValueError as e:
         # Handle configuration errors (e.g., missing API key)
         console.print(f"\n[red]✗[/red] Configuration error: {e}\n")
-        sys.exit(1)
-    
-    except typer.BadParameter as e:
-        # Handle persona validation errors
-        console.print(f"\n[red]✗[/red] {e}\n")
         sys.exit(1)
     
     except Exception as e:
