@@ -1,0 +1,52 @@
+{
+  "persona": "domain_expert",
+  "exemplars": [
+    {
+      "name": "Werner Vogels",
+      "track_record": "CTO of Amazon since 2005; instrumental in building AWS; PhD in computer science; former researcher at Cornell University",
+      "constraints": "Built AWS from scratch to become the world's largest cloud platform; faced massive scaling challenges; maintained high reliability and security standards",
+      "notable_actions": [
+        "Architected AWS with service-oriented design enabling independent scaling of components",
+        "Pioneered the concept of 'you build it, you run it' operational model",
+        "Emphasized distributed systems principles and fault tolerance in cloud architecture",
+        "Advocated for API-first design and loose coupling between services",
+        "Implemented comprehensive monitoring and observability as core platform capabilities"
+      ],
+      "public_refs": [
+        "https://en.wikipedia.org/wiki/Werner_Vogels",
+        "https://www.linkedin.com/in/wernervogels"
+      ]
+    },
+    {
+      "name": "Jeff Rothschild",
+      "track_record": "VP of Engineering at Facebook (Meta); former VP at Veritas Software; scaled Facebook from millions to billions of users",
+      "constraints": "Joined Facebook during critical growth phase; had to rebuild infrastructure for massive scale; faced unprecedented technical challenges",
+      "notable_actions": [
+        "Redesigned Facebook's infrastructure to handle exponential user growth",
+        "Implemented sharding and caching strategies to scale database operations",
+        "Built engineering culture focused on reliability and rapid iteration",
+        "Established technical standards and best practices for web-scale systems",
+        "Led technical integration of major acquisitions including Instagram and WhatsApp"
+      ],
+      "public_refs": [
+        "https://www.quora.com/profile/Jeff-Rothschild-1"
+      ]
+    },
+    {
+      "name": "Adrian Cockcroft",
+      "track_record": "VP of Cloud Architecture at AWS; former Cloud Architect at Netflix; pioneered cloud-native architecture patterns",
+      "constraints": "Led Netflix's migration from data centers to AWS; had to maintain service during migration; established cloud-native best practices",
+      "notable_actions": [
+        "Developed Netflix's Chaos Monkey to test system resilience",
+        "Pioneered microservices architecture patterns at scale",
+        "Established cloud migration strategies that became industry standards",
+        "Advocated for fault-tolerant design and graceful degradation",
+        "Created open-source tools (Eureka, Hystrix, Zuul) that became foundational to cloud-native development"
+      ],
+      "public_refs": [
+        "https://www.linkedin.com/in/adriancockcroft",
+        "https://aws.amazon.com/blogs/aws/category/aws-cloud-architecture/"
+      ]
+    }
+  ]
+}

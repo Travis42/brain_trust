@@ -1,0 +1,51 @@
+{
+  "persona": "risk_officer",
+  "exemplars": [
+    {
+      "name": "Jamie Dimon",
+      "track_record": "CEO and Chairman of JPMorgan Chase; led bank through 2008 financial crisis; built largest US bank by assets; known for risk management expertise",
+      "constraints": "Faced unprecedented financial crisis; had to manage systemic risk while maintaining operations; dealt with regulatory scrutiny and public pressure",
+      "notable_actions": [
+        "Steered JPMorgan through 2008 crisis while other major banks failed",
+        "Implemented comprehensive risk assessment frameworks across all business lines",
+        "Maintained strong capital reserves and liquidity buffers before crisis hit",
+        "Advocated for stress testing and scenario planning as standard risk practices",
+        "Built risk culture where risk officers had direct access to board and CEO"
+      ],
+      "public_refs": [
+        "https://en.wikipedia.org/wiki/Jamie_Dimon",
+        "https://www.jpmorganchase.com/ceo"
+      ]
+    },
+    {
+      "name": "Gary Cohn",
+      "track_record": "Former President and COO of Goldman Sachs; former Director of National Economic Council; known for risk management and trading expertise",
+      "constraints": "Managed risk during multiple market crises; operated in highly regulated financial sector; balanced risk-taking with prudent controls",
+      "notable_actions": [
+        "Developed Goldman's risk management systems and trading controls",
+        "Implemented position limits and concentration risk controls",
+        "Built comprehensive market risk monitoring and reporting systems",
+        "Established risk committees with clear escalation protocols",
+        "Advocated for 'risk appetite' frameworks aligned with business strategy"
+      ],
+      "public_refs": [
+        "https://en.wikipedia.org/wiki/Gary_Cohn"
+      ]
+    },
+    {
+      "name": "John Flint",
+      "track_record": "Former CEO of HSBC; former head of Retail Banking and Wealth Management; focused on risk governance and regulatory compliance",
+      "constraints": "Operated across multiple jurisdictions with complex regulatory requirements; managed global bank through post-crisis reforms; faced anti-money laundering compliance challenges",
+      "notable_actions": [
+        "Strengthened HSBC's risk governance and compliance frameworks",
+        "Implemented enhanced anti-money laundering and sanctions screening",
+        "Reduced risk-weighted assets to improve capital efficiency",
+        "Established three lines of defense model for risk management",
+        "Prioritized regulatory remediation and compliance investments"
+      ],
+      "public_refs": [
+        "https://en.wikipedia.org/wiki/John_Flint_(banker)"
+      ]
+    }
+  ]
+}

@@ -2,6 +2,14 @@
 
 This guide explains how to add new advisor personas to the Brain Trust CLI application.
 
+## Exemplar-Based Reasoning
+
+All advisor personas now use **exemplar-based reasoning** - they cite specific actions taken by real people with proven track records to support their recommendations. This grounds advice in concrete experiences rather than abstract theory.
+
+Each persona can have an associated JSON file in `data/exemplars/` containing exemplars - real people whose actions and decisions provide social proof for that persona's recommendations.
+
+See [Exemplars](#exemplars) section below for details on creating and managing exemplar files.
+
 ## Understanding Personas
 
 Each persona in Brain Trust is an AI advisor with a specific role, perspective, and system prompt. Personas analyze questions independently and provide structured insights that the Summarizer synthesizes into an executive summary.
@@ -207,3 +215,99 @@ Here are some ideas for additional personas you might consider:
 - **Change Management Expert**: Organizational change and adoption considerations
 
 Each should follow the same structure and include the advisor guardrails.
+
+## Exemplars
+
+Exemplars are real people with proven track records whose actions and decisions provide social proof for persona recommendations. Each persona can have an associated exemplar file in `data/exemplars/<persona>.json`.
+
+### Exemplar File Structure
+
+Each exemplar JSON file follows this structure:
+
+```json
+{
+  "persona": "strategist",
+  "exemplars": [
+    {
+      "name": "Exemplar Name",
+      "track_record": "Brief description of achievements and status",
+      "constraints": "Contextual constraints they operated under",
+      "notable_actions": [
+        "Specific action 1 they took",
+        "Specific action 2 they took",
+        "Specific action 3 they took"
+      ],
+      "public_refs": [
+        "https://reference-url-1",
+        "https://reference-url-2"
+      ]
+    }
+  ]
+}
+```
+
+### Creating Exemplar Files
+
+1. Create a new JSON file in `data/exemplars/` directory named after your persona (e.g., `financial_analyst.json`)
+2. Add 3-5 exemplars that represent the persona archetype
+3. Each exemplar should be a real person with:
+   - A proven track record in the persona's domain
+   - Specific, verifiable actions they took
+   - Public references (LinkedIn, Wikipedia, articles, etc.)
+4. Save the file
+
+### How Exemplars Are Used
+
+When an advisor analyzes a question:
+1. The system loads the persona's exemplar file
+2. Exemplars are injected into the advisor's prompt
+3. The advisor is instructed to:
+   - Look into their memory of these exemplars
+   - Cite specific actions exemplars took that support recommendations
+   - Format citations as: "This approach is consistent with [Exemplar Name]'s action: [specific action]"
+   - NOT invent or hallucinate exemplar actions
+4. This grounds advice in concrete experiences of real people
+
+### Example Exemplar File
+
+Here's an example for a "Financial Analyst" persona:
+
+```json
+{
+  "persona": "financial_analyst",
+  "exemplars": [
+    {
+      "name": "Mary Meeker",
+      "track_record": "Former Wall Street analyst at Morgan Stanley; partner at Kleiner Perkins; authored influential Internet Trends reports",
+      "constraints": "Operated in high-pressure financial markets; had to make predictions about emerging technologies",
+      "notable_actions": [
+        "Pioneered annual Internet Trends report covering technology and market shifts",
+        "Identified mobile-first trends before they became mainstream",
+        "Advocated for data-driven investment decisions",
+        "Made accurate predictions about e-commerce and social media growth"
+      ],
+      "public_refs": [
+        "https://en.wikipedia.org/wiki/Mary_Meeker",
+        "https://www.kleinerperkins.com/people/mary-meeker"
+      ]
+    }
+  ]
+}
+```
+
+### Managing Exemplars
+
+- **Location**: All exemplar files should be in `data/exemplars/` directory
+- **Default**: If no exemplar file exists for a persona, the advisor operates without exemplars
+- **Customization**: Users can specify a custom exemplars directory via:
+  - CLI flag: `--exemplars-dir /path/to/exemplars`
+  - Environment variable: `EXEMPLARS_DIR=/path/to/exemplars`
+- **Validation**: The system validates JSON structure and required fields on load
+
+### Best Practices
+
+1. **Choose Relevant Exemplars**: Select people whose expertise directly relates to the persona's domain
+2. **Use Verifiable Actions**: Include specific, documented actions rather than general praise
+3. **Provide Public References**: Include links to LinkedIn, Wikipedia, articles, or other public sources
+4. **Balance Quantity**: 3-5 exemplars provide good coverage without overwhelming the prompt
+5. **Keep Current**: Ensure exemplars' track records are relevant to modern contexts

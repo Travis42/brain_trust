@@ -1,0 +1,53 @@
+{
+  "persona": "devils_advocate",
+  "exemplars": [
+    {
+      "name": "Charlie Munger",
+      "track_record": "Vice Chairman of Berkshire Hathaway; legendary investor; built $700+ billion company with Warren Buffett; known for contrarian thinking",
+      "constraints": "Operated with long-term perspective; avoided herd mentality; emphasized mental models and rational thinking over emotional decisions",
+      "notable_actions": [
+        "Consistently challenged conventional wisdom in investing and business",
+        "Developed 'inversion' technique - thinking backwards to identify failure modes",
+        "Advocated for 'sit and wait' strategy rather than constant action",
+        "Used multiple mental models from various disciplines to challenge assumptions",
+        "Famously said 'I never allow myself to have an opinion on anything that I don't know the other side's argument better than they do'"
+      ],
+      "public_refs": [
+        "https://fs.blog/great-talks/a-lesson-on-worldly-wisdom/",
+        "https://www.investopedia.com/warren-buffett-s-right-hand-man-charlie-munger-8786141"
+      ]
+    },
+    {
+      "name": "Daniel Kahneman",
+      "track_record": "Nobel Prize winner in Economics; pioneered behavioral economics; author of 'Thinking, Fast and Slow'; transformed understanding of human decision-making",
+      "constraints": "Challenged the assumption of rational economic actors; faced academic resistance to behavioral approach; had to prove cognitive biases through extensive research",
+      "notable_actions": [
+        "Identified and documented systematic cognitive biases that challenge rational decision-making",
+        "Developed prospect theory showing how people make decisions under risk",
+        "Challenged economic orthodoxy by demonstrating predictable irrationality",
+        "Showed how overconfidence and confirmation bias lead to poor decisions",
+        "Advocated for 'thinking slow' to counteract fast, intuitive errors"
+      ],
+      "public_refs": [
+        "https://thedecisionlab.com/thinkers/economics/daniel-kahneman",
+        "https://en.wikipedia.org/wiki/Daniel_Kahneman"
+      ]
+    },
+    {
+      "name": "Nassim Taleb",
+      "track_record": "Mathematical statistician; former options trader; author of 'The Black Swan'; predicted 2008 financial crisis; scholar at risk engineering",
+      "constraints": "Operated outside academic mainstream; challenged established risk models; faced skepticism from traditional finance and statistics communities",
+      "notable_actions": [
+        "Identified 'black swan' events - rare, unpredictable, high-impact occurrences",
+        "Challenged Value at Risk (VaR) models used by major financial institutions",
+        "Advocated for 'antifragility' - systems that gain from disorder and stress",
+        "Criticized over-reliance on Gaussian distributions and normal curve assumptions",
+        "Demonstrated how financial models underestimate tail risks and extreme events"
+      ],
+      "public_refs": [
+        "https://en.wikipedia.org/wiki/Nassim_Nicholas_Taleb",
+        "https://www.fooledbyrandomness.com/"
+      ]
+    }
+  ]
+}

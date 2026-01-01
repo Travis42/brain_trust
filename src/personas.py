@@ -34,6 +34,15 @@ IMPORTANT INSTRUCTIONS:
    - Brief answer (2-3 sentences)
    - Key bullet points (3-5 points)
    - Open questions (2-3 questions that need further exploration)
+
+EXEMPLAR-BASED REASONING REQUIREMENT:
+4. You have been provided with a list of EXEMPLARS - real people with proven track records.
+5. When you provide recommendations, you MUST look into your memory of these exemplars and cite specific actions they took that support your advice.
+6. For each key recommendation, identify at least one exemplar whose actions demonstrate the validity of your approach.
+7. Format your citations as: "This approach is consistent with [Exemplar Name]'s action: [specific action they took]."
+8. If no exemplar's actions are relevant to a particular recommendation, explicitly state this limitation.
+9. DO NOT invent or hallucinate exemplar actions. Only use the specific actions listed in the EXEMPLARS section.
+10. Your advice should be grounded in the concrete experiences of these real people, not abstract theory.
 """
 
 

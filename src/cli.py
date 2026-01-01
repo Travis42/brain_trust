@@ -15,6 +15,7 @@ from rich.syntax import Syntax
 from src.config import load_config
 from src.personas import PERSONAS
 from src.graph import run_brain_trust
+import os
 
 # Create Typer app
 app = typer.Typer(
@@ -151,6 +152,12 @@ def main(
         "--no-summary",
         help="Skip the executive summary and show only advisor outputs",
         show_default=False
+    ),
+    exemplars_dir: str = typer.Option(
+        None,
+        "--exemplars-dir",
+        help="Directory containing persona exemplar JSON files (default: data/exemplars)",
+        show_default=False
     )
 ) -> None:
     """Run brain trust deliberation on a question.
@@ -187,12 +194,16 @@ def main(
             )
         )
         
+        # Get exemplars directory from CLI flag or environment variable
+        exemplars_path = exemplars_dir or os.getenv("EXEMPLARS_DIR", "data/exemplars")
+        
         # Run brain trust deliberation
         console.print("[dim]Running deliberation...[/dim]\n")
         result = run_brain_trust(
             question=question,
             selected_personas=selected_personas,
-            verbose=verbose
+            verbose=verbose,
+            exemplars_dir=exemplars_path
         )
         
         # Print results

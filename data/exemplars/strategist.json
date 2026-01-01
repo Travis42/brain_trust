@@ -1,0 +1,52 @@
+{
+  "persona": "strategist",
+  "exemplars": [
+    {
+      "name": "Reid Hoffman",
+      "track_record": "Co-founder of LinkedIn, sold to Microsoft for $26 billion; Greylock partner; multiple successful investments",
+      "constraints": "Built LinkedIn from scratch with initial focus on professional networking; emphasized network effects and user value over early monetization",
+      "notable_actions": [
+        "Prioritized network effects by focusing on user growth and engagement before monetization",
+        "Made strategic decision to sell to Microsoft when the platform reached critical mass",
+        "Advocated for 'blitzscaling' - rapid scaling to capture market leadership despite uncertainty",
+        "Emphasized building teams and culture as competitive advantages",
+        "Pivoted from SocialNet to LinkedIn after learning from initial market feedback"
+      ],
+      "public_refs": [
+        "https://en.wikipedia.org/wiki/Reid_Hoffman",
+        "https://www.linkedin.com/in/reidhoffman"
+      ]
+    },
+    {
+      "name": "Andy Walsh",
+      "track_record": "3x founder with 2 exits; board member and strategic advisor; angel investor",
+      "constraints": "Capital-efficient scaling; remote-first team building; focus on sustainable growth over vanity metrics",
+      "notable_actions": [
+        "Built companies with minimal external funding while achieving profitable exits",
+        "Implemented remote-first culture before it became mainstream",
+        "Focused on unit economics and customer retention over growth at all costs",
+        "Strategically timed exits based on market conditions and company maturity",
+        "Advised multiple companies on exit strategies and capital-efficient growth"
+      ],
+      "public_refs": [
+        "https://www.linkedin.com/in/anwalsh"
+      ]
+    },
+    {
+      "name": "Brian Chesky",
+      "track_record": "Co-founder and CEO of Airbnb; grew from air mattress concept to $100+ billion company",
+      "constraints": "Started with no funding; faced regulatory challenges; built trust marketplace from scratch",
+      "notable_actions": [
+        "Pivoted from air mattresses to full home rentals after discovering real user demand",
+        "Implemented professional photography program to build trust and improve listings",
+        "Navigated complex regulatory landscapes by engaging with cities proactively",
+        "Focused on user experience and community building as core differentiators",
+        "Made strategic decisions to cut non-core offerings during COVID crisis to preserve core business"
+      ],
+      "public_refs": [
+        "https://www.linkedin.com/in/brianchesky",
+        "https://about.airbnb.com/our-story"
+      ]
+    }
+  ]
+}

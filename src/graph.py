@@ -30,6 +30,7 @@ def keep_first(left, right):
 
 from src.config import get_openai_client, load_config
 from src.personas import PERSONAS, Persona
+from src.exemplars import get_exemplars_prompt_block
 
 
 class BrainTrustState(TypedDict):
@@ -53,11 +54,12 @@ class BrainTrustState(TypedDict):
     transcript: Annotated[Optional[list[dict]], keep_first]
 
 
-def advisor_node(persona_name: str):
+def advisor_node(persona_name: str, exemplars_dir: Optional[str] = None):
     """Create a LangGraph node function for a specific advisor persona.
     
     Args:
         persona_name: The name of the persona (must exist in PERSONAS)
+        exemplars_dir: Optional path to exemplars directory
         
     Returns:
         A LangGraph node function that processes the state and updates
@@ -79,15 +81,20 @@ def advisor_node(persona_name: str):
         # Get current scratchpad content for this persona (or empty string if not exists)
         current_scratchpad = state.get("scratchpads", {}).get(persona_name, "")
         
-        # Build the prompt with system prompt, question, and current scratchpad
+        # Load exemplars for this persona
+        exemplars_block = get_exemplars_prompt_block(persona_name, exemplars_dir)
+        
+        # Build the prompt with system prompt (including exemplars), question, and current scratchpad
         messages = [
             SystemMessage(content=persona.system_prompt),
             HumanMessage(content=f"""Question: {question}
-
-Your private scratchpad (for your reasoning only, do not include in your final response):
-{current_scratchpad if current_scratchpad else "[Empty - start fresh]"}
-
-Please provide your analysis following the structure in your system prompt.
+    
+    Your private scratchpad (for your reasoning only, do not include in your final response):
+    {current_scratchpad if current_scratchpad else "[Empty - start fresh]"}
+    
+    {exemplars_block}
+    
+    Please provide your analysis following the structure in your system prompt.
 
 IMPORTANT: Your response should include two parts:
 1. Your advisor output (the structured response as specified in your system prompt)
@@ -238,7 +245,7 @@ Format your response as:
     return new_state
 
 
-def create_brain_trust_graph():
+def create_brain_trust_graph(exemplars_dir: Optional[str] = None):
     """Create and compile the brain trust LangGraph.
     
     The graph structure:
@@ -246,6 +253,9 @@ def create_brain_trust_graph():
     - All advisors connect to the summarizer node (barrier)
     - Summarizer connects to END
     
+    Args:
+        exemplars_dir: Optional path to exemplars directory
+        
     Returns:
         A compiled StateGraph ready for invocation
     """
@@ -259,7 +269,7 @@ def create_brain_trust_graph():
     ]
     
     for advisor_name in advisor_names:
-        graph.add_node(advisor_name, advisor_node(advisor_name))
+        graph.add_node(advisor_name, advisor_node(advisor_name, exemplars_dir))
     
     # Add the summarizer node
     graph.add_node("summarizer", summarizer_node)
@@ -289,7 +299,8 @@ def create_brain_trust_graph():
 def run_brain_trust(
     question: str,
     selected_personas: Optional[list[str]] = None,
-    verbose: bool = False
+    verbose: bool = False,
+    exemplars_dir: Optional[str] = None
 ) -> BrainTrustState:
     """Run the brain trust deliberation on a question.
     
@@ -298,6 +309,7 @@ def run_brain_trust(
         selected_personas: Optional list of persona names to use.
                           If None, all non-summarizer personas are used.
         verbose: If True, includes a transcript of all node executions
+        exemplars_dir: Optional path to exemplars directory. If None, uses default.
         
     Returns:
         The final state with advisor_outputs, summary, and dissent populated
@@ -315,7 +327,7 @@ def run_brain_trust(
     
     # Create and invoke the graph
     # LangGraph will run all advisors in parallel, then the summarizer
-    graph = create_brain_trust_graph()
+    graph = create_brain_trust_graph(exemplars_dir=exemplars_dir)
     final_state = graph.invoke(initial_state)
     
     return final_state

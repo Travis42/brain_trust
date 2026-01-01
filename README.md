@@ -51,6 +51,7 @@ TOP_P=1.0
 | `MODEL` | No | `anthropic/claude-3.5-sonnet` | Model name to use |
 | `TEMPERATURE` | No | `0.7` | Sampling temperature (0.0-2.0) |
 | `TOP_P` | No | `1.0` | Nucleus sampling parameter (0.0-1.0) |
+| `EXEMPLARS_DIR` | No | `data/exemplars` | Directory containing persona exemplar JSON files |
 
 ## Usage
 
@@ -90,6 +91,21 @@ Show only advisor outputs without executive summary:
 
 ```bash
 python -m src.cli "What's our go-to-market strategy?" --no-summary
+```
+
+### Custom Exemplars Directory
+
+Use a custom directory for exemplar files:
+
+```bash
+python -m src.cli "What's our go-to-market strategy?" --exemplars-dir /path/to/custom/exemplars
+```
+
+Or set the `EXEMPLARS_DIR` environment variable:
+
+```bash
+export EXEMPLARS_DIR=/path/to/custom/exemplars
+python -m src.cli "What's our go-to-market strategy?"
 ```
 
 ### Combined Options
