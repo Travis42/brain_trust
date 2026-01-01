@@ -116,6 +116,29 @@ You can combine multiple options:
 python -m src.cli "Should we open source our project?" -p strategist,ethicist -v
 ```
 
+## Exemplars System
+
+Brain Trust uses exemplars—real people with proven track records—to ground each advisor's recommendations in established expertise. Each persona is associated with exemplars whose expertise aligns with that advisor's perspective.
+
+### How Exemplars Work
+
+- **Simplified Format**: Exemplars are stored as simple name lists in JSON files under [`data/exemplars/`](data/exemplars/)
+- **Knowledge-Based Reasoning**: Rather than pre-defining specific actions for each exemplar, the LLM researches each individual from its knowledge base to find novel, contextually relevant precedents
+- **Dynamic Citations**: This approach enables more diverse and tailored recommendations, as the model can cite different actions or decisions depending on the specific question
+
+### Customizing Exemplars
+
+You can customize exemplars for each persona by editing the JSON files in [`data/exemplars/`](data/exemplars/):
+
+```json
+{
+  "persona": "strategist",
+  "exemplars": ["Reid Hoffman", "Andy Walsh", "Brian Chesky"]
+}
+```
+
+To use a custom exemplars directory, set the `EXEMPLARS_DIR` environment variable or use the `--exemplars-dir` CLI option.
+
 ## Available Personas
 
 Brain Trust includes six specialized advisor personas:

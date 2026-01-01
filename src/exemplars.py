@@ -12,46 +12,22 @@ from pathlib import Path
 
 
 class Exemplar:
-    """Represents a single exemplar with track record and notable actions.
+    """Represents a single exemplar with a name.
     
     Attributes:
         name: The name of the exemplar
-        track_record: Brief description of their achievements and status
-        constraints: Contextual constraints they operated under
-        notable_actions: List of specific actions they took
-        public_refs: List of public references/links
     """
     
-    def __init__(
-        self,
-        name: str,
-        track_record: str,
-        constraints: str,
-        notable_actions: List[str],
-        public_refs: List[str]
-    ):
+    def __init__(self, name: str):
         self.name = name
-        self.track_record = track_record
-        self.constraints = constraints
-        self.notable_actions = notable_actions
-        self.public_refs = public_refs
     
     def format_for_prompt(self) -> str:
         """Format this exemplar for injection into persona prompts.
         
         Returns:
-            A formatted string describing the exemplar's track record,
-            constraints, and notable actions.
+            The exemplar's name.
         """
-        actions_text = "\n    - ".join(self.notable_actions)
-        refs_text = ", ".join(self.public_refs) if self.public_refs else "No public references"
-        
-        return f"""{self.name}
-  Track Record: {self.track_record}
-  Constraints: {self.constraints}
-  Notable Actions:
-    - {actions_text}
-  References: {refs_text}"""
+        return self.name
 
 
 def load_exemplars_for_persona(
@@ -115,21 +91,25 @@ def load_exemplars_for_persona(
             f"'exemplars' field in {exemplar_file} must be a list"
         )
     
-    # Parse exemplars
+    # Parse exemplars - new format: list of names (strings)
     exemplars = []
     for exemplar_data in exemplars_data:
-        try:
-            exemplar = Exemplar(
-                name=exemplar_data["name"],
-                track_record=exemplar_data["track_record"],
-                constraints=exemplar_data["constraints"],
-                notable_actions=exemplar_data["notable_actions"],
-                public_refs=exemplar_data.get("public_refs", [])
-            )
+        if isinstance(exemplar_data, str):
+            # New format: string name
+            exemplar = Exemplar(name=exemplar_data)
             exemplars.append(exemplar)
-        except KeyError as e:
+        elif isinstance(exemplar_data, dict):
+            # Backward compatibility: old format with dict
+            try:
+                exemplar = Exemplar(name=exemplar_data["name"])
+                exemplars.append(exemplar)
+            except KeyError as e:
+                raise ValueError(
+                    f"Exemplar in {exemplar_file} missing required field: {e}"
+                )
+        else:
             raise ValueError(
-                f"Exemplar in {exemplar_file} missing required field: {e}"
+                f"Exemplar in {exemplar_file} must be a string or dict"
             )
     
     return exemplars
@@ -148,18 +128,16 @@ def format_exemplars_for_prompt(exemplars: List[Exemplar]) -> str:
     if not exemplars:
         return ""
     
-    formatted = "\n\n".join([
-        exemplar.format_for_prompt()
-        for exemplar in exemplars
-    ])
+    # Get comma-separated list of names
+    names = ", ".join([exemplar.name for exemplar in exemplars])
     
     return f"""=== EXEMPLARS ===
-These are real people with proven track records whose actions and decisions
-provide social proof for this persona's recommendations. When you provide advice,
-you MUST look into your memory of these exemplars and cite specific actions
-they took that support your recommendations.
+These are real people with proven track records whose expertise aligns with this
+persona. When providing recommendations, research these individuals from your
+knowledge base and cite specific actions, decisions, or approaches they took
+that support your advice.
 
-{formatted}
+Exemplars: {names}
 
 === END EXEMPLARS ==="""
 

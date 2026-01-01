@@ -65,57 +65,22 @@ def test_exemplar_creation():
     """Test that Exemplar objects can be created with valid data."""
     from src.exemplars import Exemplar
     
-    exemplar = Exemplar(
-        name="Test Person",
-        track_record="Test track record",
-        constraints="Test constraints",
-        notable_actions=["Action 1", "Action 2"],
-        public_refs=["https://example.com"]
-    )
+    exemplar = Exemplar(name="Test Person")
     
     assert exemplar.name == "Test Person", "Name not set correctly"
-    assert exemplar.track_record == "Test track record", "Track record not set correctly"
-    assert exemplar.constraints == "Test constraints", "Constraints not set correctly"
-    assert len(exemplar.notable_actions) == 2, "Notable actions not set correctly"
-    assert len(exemplar.public_refs) == 1, "Public refs not set correctly"
 
 
 def test_exemplar_format_for_prompt():
     """Test that Exemplar.format_for_prompt() returns correct format."""
     from src.exemplars import Exemplar
     
-    exemplar = Exemplar(
-        name="Jane Doe",
-        track_record="CEO of Acme Corp",
-        constraints="Budget constraints, 6-month timeline",
-        notable_actions=["Pivoted to SaaS model", "Cut costs by 30%"],
-        public_refs=["https://linkedin.com/in/janedoe"]
-    )
+    exemplar = Exemplar(name="Jane Doe")
     
     formatted = exemplar.format_for_prompt()
     
-    assert "Jane Doe" in formatted, "Name not in formatted output"
-    assert "CEO of Acme Corp" in formatted, "Track record not in formatted output"
-    assert "Budget constraints" in formatted, "Constraints not in formatted output"
-    assert "Pivoted to SaaS model" in formatted, "Action not in formatted output"
-    assert "https://linkedin.com/in/janedoe" in formatted, "Public ref not in formatted output"
+    assert formatted == "Jane Doe", "Should return just the name"
 
 
-def test_exemplar_format_empty_refs():
-    """Test that Exemplar.format_for_prompt() handles empty public refs."""
-    from src.exemplars import Exemplar
-    
-    exemplar = Exemplar(
-        name="Test Person",
-        track_record="Test track record",
-        constraints="Test constraints",
-        notable_actions=["Action 1"],
-        public_refs=[]
-    )
-    
-    formatted = exemplar.format_for_prompt()
-    
-    assert "No public references" in formatted, "Should handle empty public refs"
 
 
 # ============================================================================
@@ -143,22 +108,7 @@ def test_load_exemplars_valid_json():
         
         test_data = {
             "persona": "test_persona",
-            "exemplars": [
-                {
-                    "name": "Test Person 1",
-                    "track_record": "Track record 1",
-                    "constraints": "Constraints 1",
-                    "notable_actions": ["Action 1", "Action 2"],
-                    "public_refs": ["https://example.com/1"]
-                },
-                {
-                    "name": "Test Person 2",
-                    "track_record": "Track record 2",
-                    "constraints": "Constraints 2",
-                    "notable_actions": ["Action 3"],
-                    "public_refs": ["https://example.com/2"]
-                }
-            ]
+            "exemplars": ["Test Person 1", "Test Person 2"]
         }
         
         with open(exemplar_file, 'w') as f:
@@ -191,39 +141,6 @@ def test_load_exemplars_malformed_json():
             raise AssertionError("Should have raised ValueError for malformed JSON")
         except ValueError as e:
             assert "Malformed JSON" in str(e), f"Error message should mention malformed JSON: {e}"
-
-
-def test_load_exemplars_missing_field():
-    """Test that load_exemplars_for_persona raises ValueError for missing required fields."""
-    from src.exemplars import load_exemplars_for_persona
-    
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_path = Path(temp_dir)
-        exemplar_file = temp_path / "test_persona.json"
-        
-        # Write JSON missing required field
-        test_data = {
-            "persona": "test_persona",
-            "exemplars": [
-                {
-                    "name": "Test Person",
-                    # Missing "track_record"
-                    "constraints": "Constraints",
-                    "notable_actions": ["Action 1"],
-                    "public_refs": []
-                }
-            ]
-        }
-        
-        with open(exemplar_file, 'w') as f:
-            json.dump(test_data, f)
-        
-        # Should raise ValueError
-        try:
-            load_exemplars_for_persona("test_persona", temp_dir)
-            raise AssertionError("Should have raised ValueError for missing field")
-        except ValueError as e:
-            assert "missing required field" in str(e), f"Error message should mention missing field: {e}"
 
 
 def test_load_exemplars_no_exemplars_field():
@@ -283,21 +200,14 @@ def test_format_exemplars_for_prompt_single():
     """Test that format_exemplars_for_prompt formats single exemplar correctly."""
     from src.exemplars import format_exemplars_for_prompt, Exemplar
     
-    exemplar = Exemplar(
-        name="Test Person",
-        track_record="Test track record",
-        constraints="Test constraints",
-        notable_actions=["Action 1", "Action 2"],
-        public_refs=["https://example.com"]
-    )
+    exemplar = Exemplar(name="Test Person")
     
     formatted = format_exemplars_for_prompt([exemplar])
     
     assert "=== EXEMPLARS ===" in formatted, "Should contain EXEMPLARS header"
     assert "=== END EXEMPLARS ===" in formatted, "Should contain EXEMPLARS footer"
     assert "Test Person" in formatted, "Should contain exemplar name"
-    assert "Test track record" in formatted, "Should contain track record"
-    assert "Action 1" in formatted, "Should contain action"
+    assert "Exemplars: Test Person" in formatted, "Should list exemplars"
 
 
 def test_format_exemplars_for_prompt_multiple():
@@ -305,27 +215,15 @@ def test_format_exemplars_for_prompt_multiple():
     from src.exemplars import format_exemplars_for_prompt, Exemplar
     
     exemplars = [
-        Exemplar(
-            name="Person 1",
-            track_record="Track 1",
-            constraints="Constraints 1",
-            notable_actions=["Action 1"],
-            public_refs=[]
-        ),
-        Exemplar(
-            name="Person 2",
-            track_record="Track 2",
-            constraints="Constraints 2",
-            notable_actions=["Action 2"],
-            public_refs=[]
-        )
+        Exemplar(name="Person 1"),
+        Exemplar(name="Person 2")
     ]
     
     formatted = format_exemplars_for_prompt(exemplars)
     
     assert "Person 1" in formatted, "Should contain first exemplar"
     assert "Person 2" in formatted, "Should contain second exemplar"
-    assert formatted.count("Track Record:") == 2, "Should have track records for both"
+    assert "Exemplars: Person 1, Person 2" in formatted, "Should list both exemplars"
 
 
 def test_get_exemplars_prompt_block():
@@ -377,14 +275,12 @@ def main():
     print("\n[Exemplar Class Tests]")
     run_test("Exemplar creation", test_exemplar_creation)
     run_test("Exemplar format_for_prompt", test_exemplar_format_for_prompt)
-    run_test("Exemplar format with empty refs", test_exemplar_format_empty_refs)
     
     # Loader Tests
     print("\n[Loader Tests]")
     run_test("Load nonexistent file", test_load_exemplars_nonexistent_file)
     run_test("Load valid JSON", test_load_exemplars_valid_json)
     run_test("Load malformed JSON", test_load_exemplars_malformed_json)
-    run_test("Load missing field", test_load_exemplars_missing_field)
     run_test("Load no exemplars field", test_load_exemplars_no_exemplars_field)
     run_test("Load empty exemplars list", test_load_exemplars_empty_exemplars_list)
     
