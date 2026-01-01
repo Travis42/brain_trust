@@ -18,8 +18,15 @@ def merge_dicts(left: dict, right: dict) -> dict:
 
 
 def keep_first(left, right):
-    """Reducer that keeps the first value (for fields that shouldn't change)."""
-    return left if left is not None else right
+    """Reducer that keeps the first meaningful value (for fields that shouldn't change).
+    
+    For strings: keeps the first non-empty string.
+    For other types: keeps the first non-None value.
+    """
+    # If left is None or an empty string, use right
+    if left is None or (isinstance(left, str) and not left):
+        return right
+    return left
 
 from src.config import get_openai_client, load_config
 from src.personas import PERSONAS, Persona
@@ -63,13 +70,19 @@ def advisor_node(persona_name: str):
         # Get the LLM client
         llm = get_openai_client()
         
+        # Ensure question is available
+        question = state.get("question", "")
+        if not question:
+            # Fallback: return state unchanged if no question
+            return state
+        
         # Get current scratchpad content for this persona (or empty string if not exists)
         current_scratchpad = state.get("scratchpads", {}).get(persona_name, "")
         
         # Build the prompt with system prompt, question, and current scratchpad
         messages = [
             SystemMessage(content=persona.system_prompt),
-            HumanMessage(content=f"""Question: {state['question']}
+            HumanMessage(content=f"""Question: {question}
 
 Your private scratchpad (for your reasoning only, do not include in your final response):
 {current_scratchpad if current_scratchpad else "[Empty - start fresh]"}
@@ -107,22 +120,22 @@ Format your response as:
             advisor_output = response_text
             updated_scratchpad = current_scratchpad
         
-        # Update state
-        state["advisor_outputs"] = state.get("advisor_outputs", {})
-        state["advisor_outputs"][persona_name] = advisor_output
-        
-        state["scratchpads"] = state.get("scratchpads", {})
-        state["scratchpads"][persona_name] = updated_scratchpad
+        # Return a NEW state dictionary with updates (don't modify input state in-place)
+        # This is critical for LangGraph's state merging in parallel execution
+        new_state = {
+            "advisor_outputs": {persona_name: advisor_output},
+            "scratchpads": {persona_name: updated_scratchpad}
+        }
         
         # Add to transcript if verbose logging is enabled
         if state.get("transcript") is not None:
-            state["transcript"].append({
+            new_state["transcript"] = state["transcript"] + [{
                 "node": persona_name,
                 "advisor_output": advisor_output,
                 "scratchpad": updated_scratchpad
-            })
+            }]
         
-        return state
+        return new_state
     
     # Set the node name for LangGraph
     node.__name__ = persona_name
@@ -148,6 +161,9 @@ def summarizer_node(state: BrainTrustState) -> BrainTrustState:
     # Get the LLM client
     llm = get_openai_client()
     
+    # Ensure question is available
+    question = state.get("question", "")
+    
     # Build the prompt with all advisor outputs (NOT scratchpads)
     advisor_outputs_text = ""
     for persona_name, output in state.get("advisor_outputs", {}).items():
@@ -157,7 +173,7 @@ def summarizer_node(state: BrainTrustState) -> BrainTrustState:
     
     messages = [
         SystemMessage(content=summarizer.system_prompt),
-        HumanMessage(content=f"""Question: {state['question']}
+        HumanMessage(content=f"""Question: {question}
 
 Advisor Responses:
 {advisor_outputs_text}
@@ -205,19 +221,69 @@ Format your response as:
         # Fallback: treat entire response as summary, no dissent
         summary = response_text
     
-    # Update state
-    state["summary"] = summary
-    state["dissent"] = dissent
+    # Return a NEW state dictionary with updates (don't modify input state in-place)
+    new_state = {
+        "summary": summary,
+        "dissent": dissent
+    }
     
     # Add to transcript if verbose logging is enabled
     if state.get("transcript") is not None:
-        state["transcript"].append({
+        new_state["transcript"] = state["transcript"] + [{
             "node": "summarizer",
             "summary": summary,
             "dissent": dissent
-        })
+        }]
     
-    return state
+    return new_state
+
+
+def create_brain_trust_graph():
+    """Create and compile the brain trust LangGraph.
+    
+    The graph structure:
+    - All advisor nodes run in parallel from the same entry point
+    - All advisors connect to the summarizer node (barrier)
+    - Summarizer connects to END
+    
+    Returns:
+        A compiled StateGraph ready for invocation
+    """
+    # Create the state graph
+    graph = StateGraph(BrainTrustState)
+    
+    # Add advisor nodes for all personas except Summarizer
+    advisor_names = [
+        name for name, persona in PERSONAS.items()
+        if not persona.is_summarizer
+    ]
+    
+    for advisor_name in advisor_names:
+        graph.add_node(advisor_name, advisor_node(advisor_name))
+    
+    # Add the summarizer node
+    graph.add_node("summarizer", summarizer_node)
+    
+    # Connect all advisors EXCEPT the first one to the summarizer
+    # The first advisor will trigger other advisors, and they will trigger the summarizer
+    # This creates a true barrier: all advisors must complete before summarizer runs
+    for advisor_name in advisor_names[1:]:
+        graph.add_edge(advisor_name, "summarizer")
+    
+    # Connect summarizer to END
+    graph.add_edge("summarizer", END)
+    
+    # Set entry point to the first advisor
+    # Connect first advisor to all other advisors for parallel execution
+    if advisor_names:
+        graph.set_entry_point(advisor_names[0])
+        # Connect first advisor to all other advisors
+        # This triggers parallel execution of all advisors
+        for advisor_name in advisor_names[1:]:
+            graph.add_edge(advisor_names[0], advisor_name)
+    
+    # Compile the graph
+    return graph.compile()
 
 
 def run_brain_trust(
@@ -236,14 +302,8 @@ def run_brain_trust(
     Returns:
         The final state with advisor_outputs, summary, and dissent populated
     """
-    # Get all advisor personas (always run all advisors)
-    advisor_names = [
-        name for name, persona in PERSONAS.items()
-        if not persona.is_summarizer
-    ]
-    
     # Initialize state
-    state: BrainTrustState = {
+    initial_state: BrainTrustState = {
         "question": question,
         "selected_personas": selected_personas,
         "advisor_outputs": {},
@@ -253,12 +313,9 @@ def run_brain_trust(
         "transcript": [] if verbose else None
     }
     
-    # Run all advisor nodes sequentially (each updates state in-place)
-    for advisor_name in advisor_names:
-        advisor_func = advisor_node(advisor_name)
-        state = advisor_func(state)
+    # Create and invoke the graph
+    # LangGraph will run all advisors in parallel, then the summarizer
+    graph = create_brain_trust_graph()
+    final_state = graph.invoke(initial_state)
     
-    # Run the summarizer node
-    state = summarizer_node(state)
-    
-    return state
+    return final_state
