@@ -37,7 +37,7 @@ Edit `.env` and set your API key:
 ```env
 OPENROUTER_API_KEY=your_api_key_here
 OPENROUTER_API_BASE=https://openrouter.ai/api/v1
-MODEL=anthropic/claude-3.5-sonnet
+google/gemini-2.0-flash-001
 TEMPERATURE=0.7
 TOP_P=1.0
 ```
@@ -48,7 +48,7 @@ TOP_P=1.0
 |----------|----------|---------|-------------|
 | `OPENROUTER_API_KEY` | Yes | - | Your OpenRouter API key |
 | `OPENROUTER_API_BASE` | No | `https://openrouter.ai/api/v1` | OpenRouter API base URL |
-| `MODEL` | No | `anthropic/claude-3.5-sonnet` | Model name to use |
+| `MODEL` | No | `google/gemini-2.0-flash-001` | Model name to use |
 | `TEMPERATURE` | No | `0.7` | Sampling temperature (0.0-2.0) |
 | `TOP_P` | No | `1.0` | Nucleus sampling parameter (0.0-1.0) |
 | `EXEMPLARS_DIR` | No | `data/exemplars` | Directory containing persona exemplar JSON files |

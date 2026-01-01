@@ -33,7 +33,7 @@ class Config(BaseModel):
         description="openrouter.ai API base URL"
     )
     model: str = Field(
-        default="anthropic/claude-3.5-sonnet",
+        default="google/gemini-2.0-flash-001",
         description="Model name to use"
     )
     temperature: float = Field(
@@ -80,7 +80,7 @@ def load_config() -> Config:
     return Config(
         api_key=api_key,
         api_base=os.getenv("OPENROUTER_API_BASE", "https://openrouter.ai/api/v1"),
-        model=os.getenv("MODEL", "anthropic/claude-3.5-sonnet"),
+        model=os.getenv("MODEL", "google/gemini-2.0-flash-001"),
         temperature=float(os.getenv("TEMPERATURE", "0.7")),
         top_p=float(os.getenv("TOP_P", "1.0")),
     )
