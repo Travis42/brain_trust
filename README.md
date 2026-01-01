@@ -184,6 +184,3 @@ You can extend Brain Trust by adding custom personas. See [`PERSONAS.md`](PERSON
 - OpenRouter API key
 - Dependencies listed in [`requirements.txt`](requirements.txt)
 
-## License
-
-[Specify your license here]
